@@ -3,7 +3,7 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
 	# el setup method se ejecuta automáticamente cada ves que se realiza un test
 	def setup
-		@user = User.new(name: "Example User", email: "user@example.com")
+		@user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar")
 	end
 
 	# Valida si el usuario creado es válido
@@ -47,5 +47,22 @@ class UserTest < ActiveSupport::TestCase
     duplicate_user.email = @user.email.upcase # validamos mayúsculas
     @user.save
     assert_not duplicate_user.valid?
+  end
+
+  test "email addresses should be saved as lower-case" do
+    mixed_case_email = "Foo@ExAMPle.CoM"
+    @user.email = mixed_case_email
+    @user.save
+    assert_equal mixed_case_email.downcase, @user.reload.email # el método reload recarga y trae un email de la DB
+  end
+
+  test "password should be present (nonblank)" do
+    @user.password = @user.password_confirmation = " " * 6
+    assert_not @user.valid?
+  end
+
+  test "password should have a minimum length" do
+    @user.password = @user.password_confirmation = "a" * 5
+    assert_not @user.valid?
   end
 end

@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+	# Dentro del modelo, el self al lado derecho es opcional: self.email.downcase
+	before_save { self.email = email.downcase }
+
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
 	# validates(:name, presence: true)
@@ -6,4 +9,7 @@ class User < ApplicationRecord
 	validates :email, presence: true, length: { maximum: 255 },
 										format: { with: VALID_EMAIL_REGEX },
 										uniqueness: { case_sensitive: false }
+
+	has_secure_password
+	validates :password, presence: true, length: { minimum: 6 }
 end
